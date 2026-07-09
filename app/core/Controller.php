@@ -1,16 +1,45 @@
 <?php
+
 class Controller
 {
-    // Hàm gọi Model
-    public function model($model)
+    /**
+     * Load Model
+     */
+    protected function model($model)
     {
-        require_once "../app/models/" . $model . ".php";
+        $modelPath = APPROOT . "/models/" . $model . ".php";
+
+        if (!file_exists($modelPath)) {
+            die("Model <b>{$model}</b> không tồn tại.");
+        }
+
+        require_once $modelPath;
+
         return new $model();
     }
 
-    // Hàm gọi View và truyền dữ liệu ($data) ra giao diện
-    public function view($view, $data = [])
+    /**
+     * Load View
+     */
+    protected function view($view, $data = array())
     {
-        require_once "../app/views/" . $view . ".php";
+        $viewPath = APPROOT . "/views/" . $view . ".php";
+
+        if (!file_exists($viewPath)) {
+            die("View <b>{$view}</b> không tồn tại.");
+        }
+
+        extract($data);
+
+        require_once $viewPath;
+    }
+
+    /**
+     * Redirect
+     */
+    protected function redirect($url)
+    {
+        header("Location: " . URLROOT . "/" . $url);
+        exit;
     }
 }

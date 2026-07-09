@@ -1,18 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 
 <head>
-    <title><?php echo $data['tieuDe']; ?></title>
+    <meta charset="UTF-8">
+    <title>Danh sách thuốc</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
-    <h1>Chào mừng đến với Web Bán Thuốc</h1>
-    <p>Đây là trang chủ hệ thống.</p>
 
-    <a href="/BanThuoc/public/TrangChu/chiTiet/5">Xem chi tiết thuốc có ID = 5</a>
-    <br>ádadsdad<br>
+<div class="container mt-5">
 
-    <a href="/BanThuoc/public/TrangChu/chiTiet/10">Xem chi tiết thuốc có ID = 10</a>
+    <h2>Danh sách thuốc</h2>
+
+    <table class="table table-bordered table-hover mt-3">
+
+        <thead class="table-dark">
+
+            <tr>
+
+                <th>ID</th>
+
+                <th>Tên thuốc</th>
+
+                <th>Danh mục</th>
+
+                <th>Hàm lượng</th>
+
+                <th>Đơn vị</th>
+
+                <th>Giá bán</th>
+
+                <th>Yêu cầu kê đơn</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        <?php foreach($data["thuoc"] as $thuoc){ ?>
+
+            <tr>
+
+                <td><?= $thuoc["idThuoc"] ?></td>
+
+                <td><?= $thuoc["tenThuoc"] ?></td>
+
+                <td><?= $thuoc["tenDanhMuc"] ?></td>
+
+                <td><?= $thuoc["hamLuong"] ?></td>
+
+                <td><?= $thuoc["donViTinh"] ?></td>
+
+                <td><?= number_format($thuoc["giaBan"],0,",",".") ?> đ</td>
+
+                <td><?= $thuoc["yeuCauKeDon"] ?></td>
+
+            </tr>
+
+        <?php } ?>
+
+        </tbody>
+
+    </table>
+
+</div>
+
 </body>
 
 </html>

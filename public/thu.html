@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaCare - Quản lý Đơn hàng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .sidebar-active {
+            background-color: #f1f5f9;
+            border-left: 4px solid #10b981;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .card-hover {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        .timeline-item {
+            position: relative;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 20px;
+            bottom: -20px;
+            width: 2px;
+            background: #e2e8f0;
+        }
+        
+        .timeline-item:last-child::before {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="w-72 bg-white border-r border-gray-200 flex flex-col">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-emerald-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl">P</div>
+                    <div>
+                        <div class="font-semibold text-2xl tracking-tight">PharmaCare</div>
+                        <div class="text-xs text-gray-500 -mt-1">Nhà thuốc trực tuyến</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-4 py-6 flex-1 overflow-auto">
+                <div class="mb-8">
+                    <div class="px-4 text-xs font-medium text-gray-400 mb-3">QUẢN LÝ</div>
+                    <a href="#" onclick="switchTab(0)" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-2xl sidebar-active" id="tab-0">
+                        <i class="fa-solid fa-boxes-stacked w-5"></i>
+                        <span class="font-medium">Quản lý Đơn hàng</span>
+                    </a>
+                    <a href="#" onclick="switchTab(1)" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-2xl mt-1" id="tab-1">
+                        <i class="fa-solid fa-pills w-5"></i>
+                        <span class="font-medium">Danh sách Thuốc</span>
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-2xl mt-1">
+                        <i class="fa-solid fa-users w-5"></i>
+                        <span class="font-medium">Khách hàng</span>
+                    </a>
+                </div>
+
+                <div class="px-4 text-xs font-medium text-gray-400 mb-3">BÁO CÁO</div>
+                <div class="space-y-1">
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-2xl">
+                        <i class="fa-solid fa-chart-column w-5"></i>
+                        <span class="font-medium">Doanh thu</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="p-4 border-t">
+                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-3xl">
+                    <div class="w-9 h-9 bg-emerald-100 text-emerald-700 rounded-2xl flex items-center justify-center font-medium">NV</div>
+                    <div class="flex-1">
+                        <div class="font-medium text-sm">Nguyễn Văn Admin</div>
+                        <div class="text-xs text-gray-500">Quản trị viên</div>
+                    </div>
+                    <button onclick="logout()" class="text-gray-400 hover:text-red-500">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Navigation -->
+            <div class="h-16 border-b bg-white flex items-center justify-between px-8">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-semibold text-gray-800">Quản lý Đơn hàng</h1>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div class="relative w-80">
+                        <input type="text" id="searchInput" 
+                               onkeyup="filterOrders()"
+                               placeholder="Tìm theo mã đơn hoặc tên khách hàng..." 
+                               class="w-full bg-gray-100 border border-transparent focus:border-emerald-300 rounded-3xl py-3 px-5 pl-12 text-sm focus:outline-none">
+                        <i class="fa-solid fa-magnifying-glass absolute left-5 top-3.5 text-gray-400"></i>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 bg-gray-100 rounded-3xl p-1">
+                        <button onclick="exportData()" 
+                                class="px-5 py-2 text-sm font-medium hover:bg-white rounded-3xl flex items-center gap-2">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Xuất Excel</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="px-8 py-6 bg-white border-b flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <select id="statusFilter" onchange="filterOrders()" 
+                            class="bg-gray-50 border border-gray-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-300">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="Đang xử lý">Đang xử lý</option>
+                        <option value="Đang giao">Đang giao</option>
+                        <option value="Hoàn tất">Hoàn tất</option>
+                        <option value="Đã huỷ">Đã huỷ</option>
+                    </select>
+                </div>
+                
+                <div class="flex-1"></div>
+                
+                <button onclick="refreshData()" 
+                        class="flex items-center gap-2 px-5 py-2.5 border border-gray-200 hover:bg-gray-50 rounded-3xl text-sm font-medium">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <span>Làm mới</span>
+                </button>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="flex-1 overflow-auto p-8">
+                <table class="w-full" id="ordersTable">
+                    <thead>
+                        <tr class="border-b border-gray-200 text-left text-sm text-gray-500">
+                            <th class="pb-4 font-medium w-40">MÃ ĐƠN</th>
+                            <th class="pb-4 font-medium">KHÁCH HÀNG</th>
+                            <th class="pb-4 font-medium">NGÀY ĐẶT</th>
+                            <th class="pb-4 font-medium">TỔNG TIỀN</th>
+                            <th class="pb-4 font-medium">TRẠNG THÁI</th>
+                            <th class="pb-4 font-medium text-center">THAO TÁC</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y" id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div id="detailModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+        <div class="bg-white w-full max-w-4xl mx-4 rounded-3xl shadow-2xl overflow-hidden">
+            <div class="px-8 py-6 border-b flex items-center justify-between">
+                <div>
+                    <div class="text-emerald-600 font-medium">ĐƠN HÀNG #<span id="modalOrderId"></span></div>
+                    <div class="text-2xl font-semibold" id="modalCustomerName"></div>
+                </div>
+                <button onclick="closeModal()" class="text-3xl text-gray-300 hover:text-gray-500">×</button>
+            </div>
+            
+            <div class="p-8 grid grid-cols-12 gap-8">
+                <div class="col-span-5 space-y-6">
+                    <div>
+                        <div class="text-xs uppercase tracking-widest text-gray-400 mb-2">Thông tin khách hàng</div>
+                        <div class="bg-gray-50 rounded-3xl p-6 space-y-4">
+                            <div class="flex gap-4">
+                                <i class="fa-solid fa-user text-emerald-500 mt-1"></i>
+                                <div class="flex-1">
+                                    <div class="text-xs text-gray-500">Họ tên</div>
+                                    <div id="modalCustomer" class="font-medium"></div>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <i class="fa-solid fa-phone text-emerald-500 mt-1"></i>
+                                <div class="flex-1">
+                                    <div class="text-xs text-gray-500">Số điện thoại</div>
+                                    <div id="modalPhone" class="font-medium"></div>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <i class="fa-solid fa-location-dot text-emerald-500 mt-1"></i>
+                                <div class="flex-1">
+                                    <div class="text-xs text-gray-500">Địa chỉ</div>
+                                    <div id="modalAddress" class="font-medium"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-xs uppercase tracking-widest text-gray-400 mb-3">Tiến trình đơn hàng</div>
+                        <div id="timeline" class="pl-4 space-y-6"></div>
+                    </div>
+                </div>
+
+                <div class="col-span-7">
+                    <div class="text-xs uppercase tracking-widest text-gray-400 mb-3">Danh sách thuốc</div>
+                    <div id="modalProducts" class="space-y-4 max-h-96 overflow-auto pr-4"></div>
+                    
+                    <div class="mt-8 border-t pt-6">
+                        <div class="flex justify-between text-sm">
+                            <div class="text-gray-500">Tạm tính</div>
+                            <div id="modalSubtotal" class="font-medium"></div>
+                        </div>
+                        <div class="flex justify-between text-sm mt-2">
+                            <div class="text-gray-500">Phí vận chuyển</div>
+                            <div class="font-medium">30.000đ</div>
+                        </div>
+                        <div class="flex justify-between text-lg font-semibold mt-4 border-t pt-4">
+                            <div>Tổng thanh toán</div>
+                            <div id="modalTotal" class="text-emerald-600"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-8 py-6 border-t flex justify-between items-center bg-gray-50">
+                <button onclick="showCancelModal()" id="cancelBtn"
+                        class="px-8 py-3 text-red-600 hover:bg-red-50 font-medium rounded-3xl flex items-center gap-2">
+                    <i class="fa-solid fa-ban"></i>
+                    Hủy đơn hàng
+                </button>
+                
+                <div class="flex gap-3">
+                    <button onclick="closeModal()" class="px-8 py-3 border border-gray-300 font-medium rounded-3xl">Đóng</button>
+                    <button onclick="updateStatus()" class="px-8 py-3 bg-emerald-600 text-white font-medium rounded-3xl">Cập nhật trạng thái</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Reason Modal -->
+    <div id="cancelModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60]">
+        <div class="bg-white rounded-3xl w-full max-w-md p-8">
+            <h2 class="text-xl font-semibold mb-6">Xác nhận hủy đơn hàng</h2>
+            <p class="text-gray-600 mb-6">Đơn hàng <span id="cancelOrderId" class="font-mono font-bold text-red-600"></span></p>
+            
+            <label class="block text-sm font-medium text-gray-700 mb-2">Lý do hủy <span class="text-red-500">*</span></label>
+            <select id="cancelReason" class="w-full border border-gray-300 rounded-2xl p-4 focus:outline-none focus:border-red-300 mb-4">
+                <option value="">Chọn lý do hủy</option>
+                <option value="Khách hàng đổi ý">Khách hàng đổi ý</option>
+                <option value="Hết thuốc trong kho">Hết thuốc trong kho</option>
+                <option value="Sai thông tin đơn hàng">Sai thông tin đơn hàng</option>
+                <option value="Khác">Khác</option>
+            </select>
+
+            <textarea id="cancelNote" rows="3" placeholder="Ghi chú thêm (nếu có)..." 
+                      class="w-full border border-gray-300 rounded-3xl p-4 focus:outline-none"></textarea>
+
+            <div class="flex gap-4 mt-8">
+                <button onclick="hideCancelModal()" class="flex-1 py-4 border border-gray-300 rounded-3xl font-medium">Quay lại</button>
+                <button onclick="confirmCancel()" class="flex-1 py-4 bg-red-600 text-white rounded-3xl font-medium">Xác nhận hủy</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let orders = [
+            {
+                id: "DH2407123",
+                customer: "Trần Thị Mai",
+                phone: "0912 345 678",
+                address: "123 Đường Nguyễn Huệ, Quận 1, TP.HCM",
+                date: "05/07/2026",
+                total: 1250000,
+                status: "Đang xử lý",
+                items: [
+                    { name: "Paracetamol 500mg", qty: 2, price: 12000 },
+                    { name: "Amoxicillin 250mg", qty: 1, price: 45000 }
+                ]
+            },
+            {
+                id: "DH2407122",
+                customer: "Lê Văn Hải",
+                phone: "0987 654 321",
+                address: "45 Đường Lê Lợi, Quận 3, TP.HCM",
+                date: "04/07/2026",
+                total: 850000,
+                status: "Đang giao",
+                items: [
+                    { name: "Vitamin C 1000mg", qty: 3, price: 28000 }
+                ]
+            },
+            {
+                id: "DH2407121",
+                customer: "Phạm Thị Lan",
+                phone: "0901 234 567",
+                address: "67 Đường Pasteur, Quận 1, TP.HCM",
+                date: "03/07/2026",
+                total: 650000,
+                status: "Hoàn tất",
+                items: [
+                    { name: "Atorvastatin 20mg", qty: 1, price: 85000 }
+                ]
+            }
+        ]
+
+        let currentOrder = null
+
+        function renderOrders(filteredOrders) {
+            const tbody = document.getElementById('tableBody')
+            tbody.innerHTML = ''
+            
+            filteredOrders.forEach(order => {
+                let statusHTML = ''
+                if (order.status === "Hoàn tất") {
+                    statusHTML = `<span class="inline-flex items-center gap-1.5 px-4 py-1 bg-emerald-100 text-emerald-700 rounded-3xl text-xs font-medium"><span class="status-dot bg-emerald-500"></span>Hoàn tất</span>`
+                } else if (order.status === "Đang giao") {
+                    statusHTML = `<span class="inline-flex items-center gap-1.5 px-4 py-1 bg-blue-100 text-blue-700 rounded-3xl text-xs font-medium"><span class="status-dot bg-blue-500"></span>Đang giao</span>`
+                } else if (order.status === "Đang xử lý") {
+                    statusHTML = `<span class="inline-flex items-center gap-1.5 px-4 py-1 bg-amber-100 text-amber-700 rounded-3xl text-xs font-medium"><span class="status-dot bg-amber-500"></span>Đang xử lý</span>`
+                } else {
+                    statusHTML = `<span class="inline-flex items-center gap-1.5 px-4 py-1 bg-red-100 text-red-700 rounded-3xl text-xs font-medium"><span class="status-dot bg-red-500"></span>Đã huỷ</span>`
+                }
+                
+                const row = document.createElement('tr')
+                row.className = "hover:bg-gray-50 cursor-pointer"
+                row.innerHTML = `
+                    <td class="py-5 font-mono text-emerald-600 font-medium">${order.id}</td>
+                    <td class="py-5">${order.customer}</td>
+                    <td class="py-5 text-gray-500">${order.date}</td>
+                    <td class="py-5 font-medium">${order.total.toLocaleString('vi-VN')}đ</td>
+                    <td class="py-5">${statusHTML}</td>
+                    <td class="py-5 text-center">
+                        <button onclick="viewDetail('${order.id}'); event.stopImmediatePropagation()" class="px-5 py-2 text-xs border border-gray-200 hover:bg-gray-50 rounded-2xl">Chi tiết</button>
+                    </td>
+                `
+                row.onclick = () => viewDetail(order.id)
+                tbody.appendChild(row)
+            })
+        }
+
+        function filterOrders() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase()
+            const statusFilter = document.getElementById('statusFilter').value
+            const filtered = orders.filter(order => {
+                const matchSearch = order.id.toLowerCase().includes(searchTerm) || order.customer.toLowerCase().includes(searchTerm)
+                const matchStatus = !statusFilter || order.status === statusFilter
+                return matchSearch && matchStatus
+            })
+            renderOrders(filtered)
+        }
+
+        function viewDetail(orderId) {
+            currentOrder = orders.find(o => o.id === orderId)
+            if (!currentOrder) return
+            
+            document.getElementById('modalOrderId').textContent = currentOrder.id
+            document.getElementById('modalCustomerName').textContent = currentOrder.customer
+            document.getElementById('modalCustomer').textContent = currentOrder.customer
+            document.getElementById('modalPhone').textContent = currentOrder.phone
+            document.getElementById('modalAddress').textContent = currentOrder.address
+            document.getElementById('modalTotal').textContent = currentOrder.total.toLocaleString('vi-VN') + 'đ'
+            document.getElementById('modalSubtotal').textContent = currentOrder.total.toLocaleString('vi-VN') + 'đ'
+            
+            const productsContainer = document.getElementById('modalProducts')
+            productsContainer.innerHTML = ''
+            currentOrder.items.forEach(item => {
+                const div = document.createElement('div')
+                div.className = "flex justify-between items-center bg-gray-50 p-5 rounded-3xl"
+                div.innerHTML = `
+                    <div>
+                        <div class="font-medium">${item.name}</div>
+                        <div class="text-xs text-gray-500">${item.qty} × ${item.price.toLocaleString('vi-VN')}đ</div>
+                    </div>
+                    <div class="font-medium">${(item.qty * item.price).toLocaleString('vi-VN')}đ</div>
+                `
+                productsContainer.appendChild(div)
+            })
+            
+            const timelineHTML = `
+                <div class="timeline-item flex gap-4">
+                    <div class="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-xs font-medium shrink-0">1</div>
+                    <div class="flex-1"><div class="font-medium">Đơn hàng đã đặt</div><div class="text-xs text-gray-500">${currentOrder.date} 10:30</div></div>
+                </div>
+                <div class="timeline-item flex gap-4">
+                    <div class="w-6 h-6 bg-emerald-600 text-white rounded-2xl flex items-center justify-center text-xs font-medium shrink-0">2</div>
+                    <div class="flex-1"><div class="font-medium">Đã xác nhận</div><div class="text-xs text-gray-500">${currentOrder.date} 11:15</div></div>
+                </div>
+                ${currentOrder.status === "Đang giao" || currentOrder.status === "Hoàn tất" ? `
+                <div class="timeline-item flex gap-4">
+                    <div class="w-6 h-6 bg-emerald-600 text-white rounded-2xl flex items-center justify-center text-xs font-medium shrink-0">3</div>
+                    <div class="flex-1"><div class="font-medium">Đang giao hàng</div><div class="text-xs text-gray-500">06/07/2026 08:45</div></div>
+                </div>` : ''}
+                ${currentOrder.status === "Hoàn tất" ? `
+                <div class="timeline-item flex gap-4">
+                    <div class="w-6 h-6 bg-emerald-600 text-white rounded-2xl flex items-center justify-center text-xs font-medium shrink-0">4</div>
+                    <div class="flex-1"><div class="font-medium">Đã giao thành công</div><div class="text-xs text-gray-500">07/07/2026 14:20</div></div>
+                </div>` : ''}
+            `
+            document.getElementById('timeline').innerHTML = timelineHTML
+            
+            document.getElementById('cancelBtn').style.display = currentOrder.status === "Hoàn tất" ? "none" : "flex"
+            
+            document.getElementById('detailModal').classList.remove('hidden')
+            document.getElementById('detailModal').classList.add('flex')
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detailModal')
+            modal.classList.add('hidden')
+            modal.classList.remove('flex')
+        }
+
+        function showCancelModal() {
+            if (!currentOrder || currentOrder.status === "Hoàn tất") {
+                alert("Không thể hủy đơn hàng đã hoàn tất!")
+                return
+            }
+            document.getElementById('cancelOrderId').textContent = currentOrder.id
+            document.getElementById('cancelModal').classList.remove('hidden')
+            document.getElementById('cancelModal').classList.add('flex')
+        }
+
+        function hideCancelModal() {
+            document.getElementById('cancelModal').classList.add('hidden')
+            document.getElementById('cancelModal').classList.remove('flex')
+        }
+
+        function confirmCancel() {
+            const reason = document.getElementById('cancelReason').value
+            if (!reason) {
+                alert("Vui lòng chọn lý do hủy đơn hàng!")
+                return
+            }
+            if (confirm(`Xác nhận hủy đơn hàng ${currentOrder.id}?\nLý do: ${reason}`)) {
+                currentOrder.status = "Đã huỷ"
+                alert(`✅ Đơn hàng ${currentOrder.id} đã được hủy thành công!\nLý do: ${reason}`)
+                hideCancelModal()
+                closeModal()
+                renderOrders(orders)
+            }
+        }
+
+        function updateStatus() {
+            if (!currentOrder) return
+            const statuses = ["Đang xử lý", "Đang giao", "Hoàn tất"]
+            const currentIndex = statuses.indexOf(currentOrder.status)
+            if (currentIndex < statuses.length - 1) {
+                currentOrder.status = statuses[currentIndex + 1]
+                alert(`Trạng thái đơn hàng đã cập nhật thành: ${currentOrder.status}`)
+                closeModal()
+                renderOrders(orders)
+            } else {
+                alert("Đơn hàng đã hoàn tất!")
+            }
+        }
+
+        function exportData() {
+            alert("Đang xuất file Excel... (Demo)")
+        }
+
+        function refreshData() {
+            document.getElementById('searchInput').value = ''
+            document.getElementById('statusFilter').value = ''
+            renderOrders(orders)
+        }
+
+        function switchTab(n) {
+            document.querySelectorAll('.sidebar-active').forEach(el => el.classList.remove('sidebar-active'))
+            document.getElementById(`tab-${n}`).classList.add('sidebar-active')
+        }
+
+        function logout() {
+            if (confirm("Đăng xuất?")) window.location.reload()
+        }
+
+        window.onload = () => {
+            renderOrders(orders)
+            console.log('%cPharmaCare Admin Panel loaded successfully ✨', 'color: #10b981; font-family: monospace')
+        }
+    </script>
+</body>
+</html>

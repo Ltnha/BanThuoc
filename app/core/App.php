@@ -1,61 +1,252 @@
 <?php
+
 class App
 {
-    protected $controller = "TrangChuController"; // Controller mặc định cho khách
-    protected $action = "index";                  // Hàm mặc định
-    protected $params = [];                       // Tham số mặc định
-    protected $subFolder = "KhachHang/";          // Mặc định hướng vào thư mục KhachHang
+    /*
+    |--------------------------------------------------------------------------
+    | Cấu hình mặc định
+    |--------------------------------------------------------------------------
+    */
+
+    private $modules = array(
+        "khachHang",
+        "admin",
+        "duocSi"
+    );
+
+    private $module = "khachHang";
+
+    private $controller = "TrangChuController";
+
+    private $method = "index";
+
+    private $params = array();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Constructor
+    |--------------------------------------------------------------------------
+    */
 
     public function __construct()
     {
-        $url = $this->urlProcess();
+        $url = $this->getUrl();
 
-        // 1. Kiểm tra nếu URL bắt đầu bằng phân hệ 'admin' hoặc 'duocSi'
-        if (isset($url[0]) && in_array($url[0], ['admin', 'duocSi'])) {
-            $this->subFolder = $url[0] . '/';
+        $this->detectModule($url);
 
-            // Đặt lại Controller mặc định tương ứng cho từng phân hệ
-            $this->controller = ($url[0] === 'admin') ? "QuanLyThuocController" : "DuyetDonController";
+        $this->detectController($url);
 
-            unset($url[0]);            // Xóa chữ 'admin' hoặc 'duocSi' khỏi URL
-            $url = array_values($url); // Reset lại chỉ số mảng về từ 0
-        }
+        $this->loadController();
 
-        // 2. Xử lý tìm kiếm Controller trong thư mục con tương ứng
-        if (isset($url[0])) {
-            $controllerName = ucfirst($url[0]) . "Controller";
-            if (file_exists("../app/controllers/" . $this->subFolder . $controllerName . ".php")) {
-                $this->controller = $controllerName;
-                unset($url[0]);
-            }
-        }
+        $this->detectMethod($url);
 
-        // Nhúng file controller tìm được vào hệ thống
-        require_once "../app/controllers/" . $this->subFolder . $this->controller . ".php";
-        $this->controller = new $this->controller;
+        $this->detectParams($url);
 
-        // 3. Xử lý tìm Action (Hàm)
-        $url = array_values($url); // Tiếp tục reset lại chỉ số mảng
-        if (isset($url[0])) {
-            if (method_exists($this->controller, $url[0])) {
-                $this->action = $url[0];
-                unset($url[0]);
-            }
-        }
+        //$this->checkPermission();
 
-        // 4. Xử lý các Tham số truyền vào (nếu có)
-        $this->params = $url ? array_values($url) : [];
-
-        // Kích hoạt hàm trong controller và truyền tham số
-        call_user_func_array([$this->controller, $this->action], $this->params);
+        $this->run();
     }
 
-    // Hàm bóc tách URL thành mảng
-    protected function urlProcess()
+
+    /*
+    |--------------------------------------------------------------------------
+    | Lấy URL
+    |--------------------------------------------------------------------------
+    */
+
+    // Chỉ đọc URL; Không biết Controller; Không biết Database.
+    private function getUrl()
     {
-        if (isset($_GET["url"])) {
-            return explode("/", filter_var(trim($_GET["url"], "/")));
+        if (isset($_GET['url'])) {
+
+            $url = rtrim($_GET['url'], '/');
+
+            $url = filter_var($url, FILTER_SANITIZE_URL);
+
+            return explode('/', $url);
         }
-        return [];
+
+        return array();
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Xác định Module
+    |--------------------------------------------------------------------------
+    */
+
+    // Nếu URL có module, thì xác định module; Nếu không, giữ nguyên module mặc định.
+    private function detectModule(&$url)
+    {
+        if (
+            isset($url[0]) &&
+            in_array($url[0], $this->modules)
+        ) {
+
+            $this->module = $url[0];
+
+            unset($url[0]);
+
+            $url = array_values($url);
+        }
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Xác định Controller
+    |--------------------------------------------------------------------------
+    */
+
+    // Nếu URL có controller, thì xác định controller; Nếu không, giữ nguyên controller mặc định.(tìm tên controlllers)
+    private function detectController(&$url)
+    {
+        if (!isset($url[0])) {
+
+            return;
+        }
+
+        $controller = ucfirst($url[0]) . "Controller";
+
+        $path =
+            APPROOT .
+            "/controllers/" .
+            $this->module .
+            "/" .
+            $controller .
+            ".php";
+
+        if (file_exists($path)) {
+
+            $this->controller = $controller;
+
+            unset($url[0]);
+
+            $url = array_values($url);
+        }
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Nạp Controller
+    |--------------------------------------------------------------------------
+    */
+
+    // Nạp file controller và khởi tạo đối tượng controller
+    private function loadController()
+    {
+        $path =
+            APPROOT .
+            "/controllers/" .
+            $this->module .
+            "/" .
+            $this->controller .
+            ".php";
+
+        if (!file_exists($path)) {
+
+            $this->show404("Không tìm thấy Controller.");
+        }
+
+        require_once $path;
+
+        $controller = $this->controller;
+
+        $this->controller = new $controller();
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Xác định Method
+    |--------------------------------------------------------------------------
+    */
+
+    // Nếu URL có method, thì xác định method; Nếu không, giữ nguyên method mặc định.
+    private function detectMethod(&$url)
+    {
+        if (!isset($url[0])) {
+
+            return;
+        }
+
+        if (method_exists($this->controller, $url[0])) {
+
+            $this->method = $url[0];
+
+            unset($url[0]);
+
+            $url = array_values($url);
+
+        } else {
+
+            $this->show404("Không tìm thấy Method.");
+        }
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tham số
+    |--------------------------------------------------------------------------
+    */
+
+    // Xác định tham số truyền vào method (nếu có)
+    private function detectParams($url)
+    {
+        $this->params = $url;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Chạy Controller
+    |--------------------------------------------------------------------------
+    */
+
+    // Gọi method của controller với tham số truyền vào (nếu có)
+    private function run()
+    {
+        call_user_func_array(
+            array(
+                $this->controller,
+                $this->method
+            ),
+            $this->params
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Middleware (Để sau)
+    |--------------------------------------------------------------------------
+    */
+
+    private function checkPermission()
+    {
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Trang lỗi 404
+    |--------------------------------------------------------------------------
+    */
+
+    // Hiển thị trang lỗi 404 với thông báo tùy chỉnh
+    private function show404($message = "")
+    {
+        http_response_code(404);
+
+        echo "<h2>404 - Not Found</h2>";
+        echo "<hr>";
+        echo "<p>".$message."</p>";
+
+        exit;
     }
 }

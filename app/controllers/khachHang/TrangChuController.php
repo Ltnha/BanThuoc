@@ -1,19 +1,20 @@
 <?php
-// File: app/controllers/TrangChuController.php
 
 class TrangChuController extends Controller
 {
+    private $thuocModel;
 
-    // Trang chủ mặc định
-    public function index()
+    public function __construct()
     {
-        // Gọi view và truyền tiêu đề trang
-        $this->view("khachHang/trangChu/index", ["tieuDe" => "Trang Chủ Bán Thuốc"]);
+        $this->thuocModel = $this->model("ThuocModel");
     }
 
-    // Trang chi tiết thuốc
-    public function chiTiet($idThuoc = "")
+    public function index()
     {
-        $this->view("khachHang/trangChu/chiTiet", ["id" => $idThuoc]);
+        $data = array();
+
+        $data["thuoc"] = $this->thuocModel->getAll();
+
+        $this->view("khachHang/trangChu/index",$data);
     }
 }
