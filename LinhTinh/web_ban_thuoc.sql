@@ -23,6 +23,8 @@ CREATE TABLE KhachHang (
 CREATE TABLE DuocSi (
     idNguoiDung INT PRIMARY KEY,
     chungChiHanhNghe VARCHAR(100) NOT NULL,
+    noiCap NVARCHAR(255) NOT NULL, -- Nơi cấp chứng chỉ hoặc bằng cấp
+    trinhDo NVARCHAR(100) NOT NULL, -- Trình độ (VD: Đại học, Cao đẳng, Thạc sĩ,...)
     FOREIGN KEY (idNguoiDung) REFERENCES NguoiDung(idNguoiDung) ON DELETE CASCADE
 );
 
