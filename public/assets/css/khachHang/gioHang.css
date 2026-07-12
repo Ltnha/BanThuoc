@@ -1,0 +1,111 @@
+body{
+    background:#f4f7fb;
+}
+
+/* Tiêu đề */
+
+h2{
+
+    font-weight:700;
+
+    color:#0d6efd;
+
+}
+
+/* Card */
+
+.giohang-box{
+
+    background:#fff;
+
+    border-radius:15px;
+
+    padding:25px;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+
+}
+
+/* Bảng */
+
+.table{
+
+    margin-top:20px;
+
+    border-radius:10px;
+
+    overflow:hidden;
+
+}
+
+.table thead{
+
+    background:#0d6efd;
+
+    color:#fff;
+
+}
+
+.table tbody tr{
+
+    transition:.25s;
+
+}
+
+.table tbody tr:hover{
+
+    background:#eef6ff;
+
+}
+
+/* Nút */
+
+.btn{
+
+    border-radius:8px;
+
+}
+
+.btn-success{
+
+    width:35px;
+
+}
+
+.btn-warning{
+
+    width:35px;
+
+}
+
+.btn-danger{
+
+    border-radius:8px;
+
+}
+
+/* Tổng tiền */
+
+.tongTien{
+
+    margin-top:20px;
+
+    text-align:right;
+
+    font-size:24px;
+
+    font-weight:bold;
+
+    color:#dc3545;
+
+}
+
+/* Giỏ trống */
+
+.alert{
+
+    border-radius:12px;
+
+    font-size:17px;
+
+}

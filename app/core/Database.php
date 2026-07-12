@@ -96,7 +96,16 @@ class Database
      */
     public function execute()
     {
-        return $this->stmt->execute();
+        $result = $this->stmt->execute();
+
+        if (!$result)
+        {
+            echo "<pre>";
+            print_r($this->stmt->errorInfo());
+            exit();
+        }
+
+        return true;
     }
 
     /**

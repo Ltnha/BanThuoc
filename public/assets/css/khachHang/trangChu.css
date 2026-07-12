@@ -1,0 +1,23 @@
+/* Định dạng lưới card sản phẩm thuốc */
+.thuoc-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e0e0e0;
+}
+
+.thuoc-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1) !important;
+}
+
+.thuoc-gia {
+    color: #dc3545;
+    font-size: 1.15rem;
+}
+
+.badge-danh-muc {
+    font-size: 0.75rem;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+}

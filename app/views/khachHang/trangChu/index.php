@@ -1,73 +1,109 @@
-<!DOCTYPE html>
-<html lang="vi">
 
-<head>
-    <meta charset="UTF-8">
-    <title>Danh sách thuốc</title>
+<link rel="stylesheet" href="<?= ASSETROOT ?>/css/khachHang/trangChu.css">
+<div class="banner mb-4">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+    <div class="p-5 bg-primary text-white rounded">
 
-<body>
+        <h1>Hệ thống bán thuốc trực tuyến</h1>
 
-<div class="container mt-5">
+        <p>Mua thuốc chính hãng - Giao hàng nhanh - Tư vấn bởi Dược sĩ</p>
 
-    <h2>Danh sách thuốc</h2>
-
-    <table class="table table-bordered table-hover mt-3">
-
-        <thead class="table-dark">
-
-            <tr>
-
-                <th>ID</th>
-
-                <th>Tên thuốc</th>
-
-                <th>Danh mục</th>
-
-                <th>Hàm lượng</th>
-
-                <th>Đơn vị</th>
-
-                <th>Giá bán</th>
-
-                <th>Yêu cầu kê đơn</th>
-
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-        <?php foreach($data["thuoc"] as $thuoc){ ?>
-
-            <tr>
-
-                <td><?= $thuoc["idThuoc"] ?></td>
-
-                <td><?= $thuoc["tenThuoc"] ?></td>
-
-                <td><?= $thuoc["tenDanhMuc"] ?></td>
-
-                <td><?= $thuoc["hamLuong"] ?></td>
-
-                <td><?= $thuoc["donViTinh"] ?></td>
-
-                <td><?= number_format($thuoc["giaBan"],0,",",".") ?> đ</td>
-
-                <td><?= $thuoc["yeuCauKeDon"] ?></td>
-
-            </tr>
-
-        <?php } ?>
-
-        </tbody>
-
-    </table>
+    </div>
 
 </div>
 
-</body>
+<div class="card shadow-sm mb-4">
 
-</html>
+    <div class="card-body">
+
+        <form>
+
+            <div class="row">
+
+                <div class="col-md-10">
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Nhập tên thuốc hoặc hoạt chất...">
+
+                </div>
+
+                <div class="col-md-2">
+
+                    <button
+                        class="btn btn-success w-100">
+
+                        Tìm kiếm
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<h3 class="mb-4">
+
+    Danh sách thuốc
+
+</h3>
+
+<div class="row">
+
+<?php foreach($danhSachThuoc as $thuoc){ ?>
+
+    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+
+        <div class="card h-100 shadow-sm">
+
+        <img
+            src="<?= ASSETROOT ?>/images/uploads/<?= $thuoc['idThuoc'] ?>/<?= $thuoc['idThuoc'] ?>-1.jpg"
+            class="card-img-top"
+            alt="<?= htmlspecialchars($thuoc['tenThuoc']) ?>">
+
+            <div class="card-body">
+
+                <h5>
+
+                    <?= $thuoc['tenThuoc']; ?>
+
+                </h5>
+
+                <p>
+
+                    <?= number_format($thuoc['giaBan']); ?> VNĐ
+
+                </p>
+
+                <a
+                href="<?= URLROOT ?>/khachHang/Thuoc/chiTiet/<?= $thuoc["idThuoc"] ?>"
+                class="btn btn-primary w-100">
+
+                    Xem chi tiết
+
+                </a>
+                <a
+                href="<?= URLROOT ?>/khachHang/GioHang/them/<?= $thuoc["idThuoc"] ?>"
+                class="btn btn-success">
+
+                    Thêm vào giỏ hàng
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+<?php } ?>
+
+</div>
+
+

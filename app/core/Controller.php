@@ -21,17 +21,19 @@ class Controller
     /**
      * Load View
      */
-    protected function view($view, $data = array())
+    public function view($view, $data = array())
     {
-        $viewPath = APPROOT . "/views/" . $view . ".php";
+        if (file_exists(APPROOT . "/views/" . $view . ".php")) {
 
-        if (!file_exists($viewPath)) {
-            die("View <b>{$view}</b> không tồn tại.");
+            extract($data);
+
+            require_once APPROOT . "/views/" . $view . ".php";
+
+        } else {
+
+            die("Không tìm thấy View.");
+
         }
-
-        extract($data);
-
-        require_once $viewPath;
     }
 
     /**

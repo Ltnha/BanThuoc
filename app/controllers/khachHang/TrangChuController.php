@@ -2,19 +2,26 @@
 
 class TrangChuController extends Controller
 {
-    private $thuocModel;
+    private $thuoc;
 
     public function __construct()
     {
-        $this->thuocModel = $this->model("ThuocModel");
+        $this->thuoc = $this->model("ThuocModel");
     }
 
     public function index()
     {
-        $data = array();
+        $data = array(
 
-        $data["thuoc"] = $this->thuocModel->getAll();
+            "danhSachThuoc"=>$this->thuoc->getAllThuoc(),
 
-        $this->view("khachHang/trangChu/index",$data);
+            "content"=>"khachHang/trangChu/index"
+
+        );
+
+        $this->view(
+            "layouts/khachHangLayout",
+            $data
+        );
     }
 }

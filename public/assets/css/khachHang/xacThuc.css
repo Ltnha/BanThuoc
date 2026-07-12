@@ -1,0 +1,28 @@
+/* Giao diện khung chứa form đăng nhập / đăng ký */
+.login-container, .register-container {
+    min-height: 60vh;
+}
+
+/* Cấu trúc nút X xóa nhanh input độc lập */
+.clear-input-btn {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: #ccc;
+    cursor: pointer;
+    display: none;
+    user-select: none;
+    z-index: 5;
+}
+
+.clear-input-btn:hover {
+    color: #666;
+}
+
+/* Định dạng nhãn text của form cho đồng bộ Bootstrap 5 */
+.form-label-custom {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
