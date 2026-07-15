@@ -18,8 +18,8 @@
 
                 <th>Trạng thái</th>
 
-                <th></th>
-
+                <th>Thao tác</th>
+                
             </tr>
 
         </thead>
@@ -68,6 +68,18 @@
 
                     </a>
 
+                    <?php if($donHang["trangThai"]=="CHO_XAC_NHAN"){ ?>
+
+                        <a
+                            href="<?= URLROOT ?>/khachHang/donHang/huy/<?= $donHang["idDonHang"] ?>"
+                            class="btn btn-danger btn-sm"
+                            onclick="return confirm('Bạn có chắc muốn hủy đơn hàng?')">
+
+                            Hủy
+
+                        </a>
+
+                    <?php } ?>
                 </td>
 
             </tr>

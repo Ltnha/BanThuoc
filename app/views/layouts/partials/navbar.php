@@ -31,6 +31,14 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        href="<?= URLROOT ?>/khachHang/donThuoc">
+                        Đơn thuốc
+                    </a>
+                </li>
+
                 <!-- Phân vùng Logic Xác Thực (Đã sửa đổi) -->
                 <li class="nav-item ms-lg-3">
                     <?php if (isset($_SESSION["user"])): ?>
@@ -39,7 +47,7 @@
                                 <i class="bi bi-person-circle"></i> <?php echo $_SESSION["user"]["hoTen"]; ?>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                                <li><a class="dropdown-menu-item p-2 text-dark text-decoration-none d-block" href="<?php echo URLROOT; ?>/khachHang/CaNhan">Trang cá nhân</a></li>
+                                <li><a class="dropdown-menu-item p-2 text-dark text-decoration-none d-block" href="<?= URLROOT ?>/khachHang/khachHang/hoSo">Trang cá nhân</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-menu-item p-2 text-danger text-decoration-none d-block" href="<?php echo URLROOT; ?>/khachHang/XacThuc/dangXuat">Đăng xuất</a></li>
                             </ul>

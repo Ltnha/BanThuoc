@@ -12,6 +12,7 @@ class DonHangController extends Controller
         $this->gioHangModel=$this->model("GioHangModel");
     }
 
+
     public function index()
     {
         if(!isset($_SESSION["user"]))
@@ -113,5 +114,19 @@ class DonHangController extends Controller
         ];
 
         $this->view("layouts/khachHangLayout",$data);
+    }
+
+    public function huy($idDonHang)
+    {
+        if(!isset($_SESSION["user"]))
+        {
+            header("Location: ".URLROOT."/khachHang/XacThuc/dangNhap");
+            exit();
+        }
+
+        $this->donHangModel->huyDonHang($idDonHang);
+
+        header("Location: ".URLROOT."/khachHang/donHang");
+        exit();
     }
 }

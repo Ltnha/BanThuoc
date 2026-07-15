@@ -126,4 +126,26 @@ class DonHangModel extends Model
         return $this->db->resultSet();
     }
 
+    /**
+     * Hủy đơn hàng
+     */
+    public function huyDonHang($idDonHang)
+    {
+        $this->db->query("
+            UPDATE DonHang
+
+            SET
+                trangThai='DA_HUY'
+
+            WHERE
+                idDonHang=:idDonHang
+
+            AND
+                trangThai='CHO_XAC_NHAN'
+        ");
+
+        $this->db->bind(":idDonHang",$idDonHang);
+
+        return $this->db->execute();
+    }
 }
